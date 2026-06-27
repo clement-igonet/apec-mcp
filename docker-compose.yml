@@ -1,0 +1,19 @@
+services:
+  apec-mcp:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      MCP_TRANSPORT: sse
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8080/sse')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
