@@ -7,7 +7,7 @@ from typing import Any
 
 from fastmcp import FastMCP
 
-from apec_mcp import client as apec
+from apec_mcp import auth, client as apec
 
 mcp = FastMCP(
     name="APEC",
@@ -18,6 +18,24 @@ mcp = FastMCP(
         "All update endpoints require the complete profile body — never send partial objects."
     ),
 )
+
+
+# ---------------------------------------------------------------------------
+# Session
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool()
+async def refresh_session() -> dict:
+    """
+    Force a fresh login to APEC using the configured APEC_EMAIL / APEC_PASSWORD
+    credentials and return basic user info to confirm the session is valid.
+
+    Call this if API tools start returning authentication errors.
+    """
+    auth.invalidate()
+    await auth.login()
+    return await apec.get("/cms/webservices/identification/apecuser")
 
 
 # ---------------------------------------------------------------------------
